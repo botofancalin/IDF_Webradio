@@ -143,7 +143,7 @@ void playlist_load_pls(playlist_t *playlist)
     uint8_t *file_start_ptr = file_start;
     int res = ini_parse_stream(pls_ini_reader, &file_start_ptr, pls_ini_handler, playlist->entries_vec);
     if(res != 0) {
-        // ESP_LOGE(TAG, "failed to load playlist err=%d", res);
+        ESP_LOGE(TAG, "failed to load playlist err=%d", res);
     }
 
     ESP_LOGI(TAG, "Tracks:");

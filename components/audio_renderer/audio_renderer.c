@@ -16,7 +16,7 @@
 
 #include "audio_player.h"
 #include "audio_renderer.h"
-#include "driver/mcpwm.c"
+#include "driver/mcpwm.h"
 
 #define TAG "renderer"
 
@@ -76,7 +76,9 @@ static void init_i2s(renderer_config_t *config)
         .data_out_num = GPIO_NUM_22,
         .data_in_num = I2S_PIN_NO_CHANGE};
 
-    /* If using Generic I2S generate the MCLCK signal on GPIO19*/
+    /* If using Generic I2S generate the MCLK signal on GPIO19
+     * May need to change the MCLK frequency value for different I2S adapters
+     * */
     if (config->output_mode == I2S)
     {
         mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_NUM_19);
@@ -85,7 +87,7 @@ static void init_i2s(renderer_config_t *config)
         mcpwm_set_pin(MCPWM_UNIT_0, &pwm_pin_config);
         gpio_pulldown_en(GPIO_NUM_19);
         mcpwm_config_t pwm_config;
-        pwm_config.frequency = (i2s_config.sample_rate) * 256; //when frequency is too high (actually only 1MHZ)there is no signal
+        pwm_config.frequency = 22499962; //Default MCLK frequency for Boom bonet.
         pwm_config.cmpr_a = 50.0;
         pwm_config.cmpr_b = 50.0;
         pwm_config.counter_mode = MCPWM_UP_COUNTER;

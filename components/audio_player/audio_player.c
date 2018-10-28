@@ -37,8 +37,7 @@ static int start_decoder_task(player_t *player)
     stack_depth = 8448;
 
     player->decoder_status = RUNNING;
-    if (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player,
-                                PRIO_MAD, NULL, 1) != pdPASS)
+    if (xTaskCreatePinnedToCore(task_func, task_name, stack_depth, player, PRIO_MAD, NULL, 1) != pdPASS)
     {
         ESP_LOGE(TAG, "ERROR creating decoder task! Out of memory?");
         player->decoder_status = STOPPED;
@@ -53,8 +52,7 @@ static int start_decoder_task(player_t *player)
 static int t;
 
 /* Writes bytes into the FIFO queue, starts decoder task if necessary. */
-int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read,
-                          void *user_data)
+int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_data)
 {
     player_t *player = user_data;
 

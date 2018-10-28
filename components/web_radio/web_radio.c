@@ -41,12 +41,13 @@ static bool headers_complete = false;
 static int on_header_field_cb(http_parser *parser, const char *at, size_t length)
 {
     // convert to lower case
-    unsigned char *c = (unsigned char *) at;
+    unsigned char *c = (unsigned char *)at;
     for (; *c; ++c)
         *c = tolower(*c);
 
     curr_header_field = 0;
-    if (strstr(at, "content-type")) {
+    if (strstr(at, "content-type"))
+    {
         curr_header_field = HDR_CONTENT_TYPE;
     }
 
@@ -55,14 +56,31 @@ static int on_header_field_cb(http_parser *parser, const char *at, size_t length
 
 static int on_header_value_cb(http_parser *parser, const char *at, size_t length)
 {
-    if (curr_header_field == HDR_CONTENT_TYPE) {
-        if (strstr(at, "application/octet-stream")) content_type = OCTET_STREAM;
-        if (strstr(at, "audio/aac")) content_type = AUDIO_AAC;
-        if (strstr(at, "audio/mp4")) content_type = AUDIO_MP4;
-        if (strstr(at, "audio/x-m4a")) content_type = AUDIO_MP4;
-        if (strstr(at, "audio/mpeg")) content_type = AUDIO_MPEG;
+    if (curr_header_field == HDR_CONTENT_TYPE)
+    {
+        if (strstr(at, "application/octet-stream"))
+        {
+            content_type = OCTET_STREAM;
+        }
+        if (strstr(at, "audio/aac"))
+        {
+            content_type = AUDIO_AAC;
+        }
+        if (strstr(at, "audio/mp4"))
+        {
+            content_type = AUDIO_MP4;
+        }
+        if (strstr(at, "audio/x-m4a"))
+        {
+            content_type = AUDIO_MP4;
+        }
+        if (strstr(at, "audio/mpeg"))
+        {
+            content_type = AUDIO_MPEG;
+        }
 
-        if(content_type == MIME_UNKNOWN) {
+        if (content_type == MIME_UNKNOWN)
+        {
             ESP_LOGE(TAG, "unknown content-type: %s", at);
             return -1;
         }
@@ -84,7 +102,7 @@ static int on_headers_complete_cb(http_parser *parser)
     return 0;
 }
 
-static int on_body_cb(http_parser* parser, const char *at, size_t length)
+static int on_body_cb(http_parser *parser, const char *at, size_t length)
 {
     //printf("%.*s", length, at);
     return audio_stream_consumer(at, length, parser->data);
@@ -106,31 +124,37 @@ static void http_get_task(void *pvParameters)
     playlist_entry_t *curr_track;
 
     /* configure callbacks */
-    http_parser_settings callbacks = { 0 };
+    http_parser_settings callbacks = {0};
     callbacks.on_body = on_body_cb;
     callbacks.on_header_field = on_header_field_cb;
     callbacks.on_header_value = on_header_value_cb;
     callbacks.on_headers_complete = on_headers_complete_cb;
     callbacks.on_message_complete = on_message_complete_cb;
 
-    for (;;) {
+    for (;;)
+    {
         // blocks until end of stream
         curr_track = playlist_curr_track(radio_conf->playlist);
-        for (i = 0; i < 20 ; i++) {
+        for (i = 0; i < 20; i++)
+        {
             if (curr_track->name[i] == '\0')
+            {
                 break;
+            }
             player->station[i] = curr_track->name[i];
         }
         player->station[i] = '\0';
         *player->title = '\0';
         player->update = true;
-        int result = http_client_get(curr_track->url, &callbacks,
-                radio_conf->player_config);
+        int result = http_client_get(curr_track->url, &callbacks, radio_conf->player_config);
 
-        if (result != 0) {
+        if (result != 0)
+        {
             ESP_LOGE(TAG, "http_client_get error");
             vTaskDelay(1000 / portTICK_PERIOD_MS);
-        } else {
+        }
+        else
+        {
             ESP_LOGI(TAG, "http_client_get completed");
         }
         // ESP_LOGI(TAG, "http_client_get stack: %d\n", uxTaskGetStackHighWaterMark(NULL));
@@ -142,7 +166,7 @@ void web_radio_start(web_radio_t *config)
 {
     // start reader task
     xTaskCreatePinnedToCore(&http_get_task, "http_get_task", 2560, config, 20,
-    NULL, 1);
+                            NULL, 1);
 }
 
 void web_radio_stop(web_radio_t *config)
@@ -161,17 +185,24 @@ void web_radio_gpio_handler_task(void *pvParams)
     xQueueHandle gpio_evt_queue = params->gpio_evt_queue;
 
     uint32_t io_num;
-    for (;;) {
-        if (xQueueReceive(gpio_evt_queue, &io_num, 20 / portTICK_PERIOD_MS)) {
+    for (;;)
+    {
+        if (xQueueReceive(gpio_evt_queue, &io_num, 20 / portTICK_PERIOD_MS))
+        {
             ESP_LOGI(TAG, "GPIO[%d] intr, val: %d", io_num, gpio_get_level(io_num));
 
             i = 0;
-            for (;;){
+            for (;;)
+            {
                 if (gpio_get_level(0))
+                {
                     break;
+                }
                 vTaskDelay(200 / portTICK_PERIOD_MS);
                 if (i++ > 10)
+                {
                     esp_restart();
+                }
             }
 
             playlist_entry_t *track = playlist_next(config->playlist);
@@ -266,13 +297,13 @@ void web_radio_gpio_handler_task(void *pvParams)
 void web_radio_init(web_radio_t *config)
 {
     controls_init(web_radio_gpio_handler_task, 2048, config);
-   // lcd_task_init(web_radio_lcd_handler_task, 2048, config);
+    // lcd_task_init(web_radio_lcd_handler_task, 2048, config);
     audio_player_init(config->player_config);
 }
 
 void web_radio_destroy(web_radio_t *config)
 {
     controls_destroy(config);
-  //  lcd_task_destroy(config);
+    //  lcd_task_destroy(config);
     audio_player_destroy(config->player_config);
 }
