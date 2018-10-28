@@ -1,0 +1,45 @@
+{
+    "configurations": [
+        {
+            "name": "Win32",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "C:/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
+                "C:/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed",
+                "C:/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/include",
+                "C:/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                "C:/msys32/home/Calin/esp/esp-idf/components/freertos/include",
+                "C:/msys32/home/Calin/esp/esp-idf/components",
+                "C:/msys32/home/Calin/esp/esp-idf/components/*/include"
+            ],
+            "defines": [
+                "_DEBUG",
+                "UNICODE",
+                "_UNICODE"
+            ],
+            "intelliSenseMode": "clang-x64",
+            "browse": {
+                "path": [
+                    "${workspaceFolder}/**",
+                    "C:/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include",
+                    "C:/msys32/opt/xtensa-esp32-elf/lib/gcc/xtensa-esp32-elf/5.2.0/include-fixed",
+                    "C:/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/include",
+                    "C:/msys32/opt/xtensa-esp32-elf/xtensa-esp32-elf/sysroot/usr/include",
+                    "C:/msys32/home/Calin/esp/esp-idf/components/freertos/include",
+                    "C:/msys32/home/Calin/esp/esp-idf/components",
+                    "C:/msys32/home/Calin/esp/esp-idf/components/*/include"
+                ],
+                "limitSymbolsToIncludedHeaders": true,
+                "databaseFilename": "${workspaceRoot}/.vscode/browse.vc.db",
+                "windowsSdkVersion": "10.0.17134.0",
+                "compilerPath": "C:/Program Files (x86)/Microsoft Visual Studio/2017/Community/VC/Tools/MSVC/14.15.26726/bin/Hostx64/x64/cl.exe",
+                "cStandard": "c11",
+                "cppStandard": "c++17",
+                "intelliSenseMode": "msvc-x64",
+                "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+            },
+            "compileCommands": "${workspaceFolder}/build/compile_commands.json"
+        }
+    ],
+    "version": 4
+}

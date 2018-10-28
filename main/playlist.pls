@@ -1,0 +1,22 @@
+[playlist]
+NumberOfEntries=10
+Title1=EuropaFm
+File1=http://astreaming.europafm.ro:8000/europafm_mp3_64k
+Title2=Profm
+File2=http://edge126.rdsnet.ro:84/profm/profm.mp3
+Title3=Digi Fm
+File3=http://edge76.rdsnet.ro:84/digifm/digifm.mp3
+Title4=Virgin Fm
+File4=http://astreaming.radio21.ro:8000/virgin_mp3_64k
+Title5=Vibe Fm
+File5=http://astreaming.vibefm.ro:8000/vibefm_mp3_64k
+Title6=The Vibe of Vegas
+File6=http://icyrelay.181.fm/181-vibe_128k.mp3
+Title7=.977 Today's Hits
+File7=http://19763.live.streamtheworld.com/977_HITS.mp3
+Title8=Glee Radio
+File8=http://bigrradio-edge1.cdnstream.com/5112_128
+Title9=MIKU MIKU MIX
+File9=http://curiosity.shoutca.st:8019/128?1423847655393.mp3
+Title10=Kibo.FM
+File10=http://listen.kibo.fm:8000
