@@ -235,7 +235,7 @@ int buf_seek_abs(buffer_t *buf, uint32_t pos)
         return -1;
     }
 
-    if (pos > buf->write_pos)
+    if (pos > *buf->write_pos)
     {
         ESP_LOGE(TAG, "buf_seek_abs failed, pos = %u larger than fill_pos %u", pos, (uint32_t)buf->write_pos);
         return -1;
@@ -243,7 +243,7 @@ int buf_seek_abs(buffer_t *buf, uint32_t pos)
 
     size_t delta = pos - (uint32_t)buf->read_pos;
     buf->bytes_consumed += delta;
-    buf->read_pos = pos;
+    *buf->read_pos = pos;
 
     return 0;
 }

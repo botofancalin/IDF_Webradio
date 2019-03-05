@@ -90,7 +90,9 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_d
         vTaskGetRunTimeStats(__stats_buffer);
         printf("%s\n", __stats_buffer);
 #endif
+#ifdef CONFIG_BUFFER_INFO
         ESP_LOGI(TAG, "Buffer fill %u%%, %d bytes RAM left %d", fill_level, bytes_in_buf, esp_get_free_heap_size());
+#endif
         player->fill_level = fill_level;
     }
 

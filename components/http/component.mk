@@ -9,5 +9,3 @@
 
 COMPONENT_SRCDIRS := .
 
-CFLAGS += -Wno-error=unused-label -Wno-error=return-type -Wno-error=missing-braces -Wno-error=pointer-sign -Wno-error=parentheses -I./include
-

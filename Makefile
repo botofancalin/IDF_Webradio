@@ -3,7 +3,7 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := mp3_decoder
+PROJECT_NAME := idf_webradio
 
 COMPONENT_ADD_INCLUDEDIRS := components/include
 

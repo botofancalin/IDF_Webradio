@@ -2,6 +2,9 @@ menu "Web Radio"
 
 menuconfig TITLE_PARSER
     bool "Title parser"
+
+menuconfig BUFFER_INFO
+    bool "Print buffer fill level"
     
 menu "Wifi Configuration"
 
