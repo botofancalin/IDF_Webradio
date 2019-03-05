@@ -1,16 +1,5 @@
 {
     "files.associations": {
-        "freertos.h": "c",
-        "gpio.h": "c",
-        "sdkconfig.h": "c",
-        "task.h": "c",
-        "semphr.h": "c",
-        "stdio.h": "c",
-        "hd44780.h": "c",
-        "mcpwm.c": "cpp",
-        "audio_renderer.h": "c",
-        "audio_player.h": "c",
-        "i2s.h": "c"
     }, "run": {
         "defaultColor": "white", // Can also use string color names.
         "commands": [

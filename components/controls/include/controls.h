@@ -8,6 +8,7 @@
 #ifndef _CONTROLS_H_
 #define _CONTROLS_H_
 
+#define CONTROL_PIN GPIO_NUM_2
 typedef struct {
     xQueueHandle gpio_evt_queue;
     void *user_data;

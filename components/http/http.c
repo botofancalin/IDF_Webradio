@@ -67,10 +67,10 @@ void str_parser(const char *str, char recv_buf, int *s)
  * @brief simple http_get
  * see https://github.com/nodejs/http-parser for callback usage
  */
-int http_client_get(char *uri, http_parser_settings *callbacks, void *user_data)
+int http_client_get(const char *uri, http_parser_settings *callbacks, void *user_data)
 {
     player_t *player = user_data;
-    url_t *url = url_parse(uri);
+    url_t *url = url_parse((char*)uri);
 
     const struct addrinfo hints = {
         .ai_family = AF_INET,

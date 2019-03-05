@@ -22,7 +22,7 @@
    #define min(x,y) ((x)<(y)?(x):(y))
 #endif
 
-#define TAG "playlist"
+#define TAG "PLAY_LIST"
 
 
 /* embedded playlist */

@@ -9,7 +9,7 @@
 #include "freertos/FreeRTOS.h"
 
 #include "audio_player.h"
-#include "spiram_fifo.h"
+#include "esp32_fifo.h"
 #include "freertos/task.h"
 
 #include "esp_system.h"
@@ -66,11 +66,11 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_d
 
     if (bytes_read > 0)
     {
-        spiRamFifoWrite(recv_buf, bytes_read);
+        FifoWrite(recv_buf, bytes_read);
     }
 
-    int bytes_in_buf = spiRamFifoFill();
-    uint8_t fill_level = (bytes_in_buf * 100) / spiRamFifoLen();
+    int bytes_in_buf = FifoFill();
+    uint8_t fill_level = (bytes_in_buf * 100) / FifoLen();
 
     // seems 4k is enough to prevent initial buffer underflow
     uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 90;
@@ -85,6 +85,11 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_d
     t = (t + 1) & 255;
     if (t == 0)
     {
+#if configGENERATE_RUN_TIME_STATS == 1 // use this only for debug since it mess up with the i2s timings
+        static char __stats_buffer[1024];
+        vTaskGetRunTimeStats(__stats_buffer);
+        printf("%s\n", __stats_buffer);
+#endif
         ESP_LOGI(TAG, "Buffer fill %u%%, %d bytes RAM left %d", fill_level, bytes_in_buf, esp_get_free_heap_size());
         player->fill_level = fill_level;
     }

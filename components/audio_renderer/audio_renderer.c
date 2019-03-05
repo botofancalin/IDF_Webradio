@@ -9,7 +9,6 @@
 #include <stdbool.h>
 
 #include "freertos/FreeRTOS.h"
-
 #include "esp_log.h"
 #include "driver/gpio.h"
 #include "driver/i2s.h"
@@ -23,6 +22,24 @@
 static renderer_config_t *renderer_instance = NULL;
 static component_status_t renderer_status = UNINITIALIZED;
 static QueueHandle_t i2s_event_queue;
+
+static renderer_config_t *create_renderer_config()
+{
+    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
+
+    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
+    renderer_config->i2s_num = I2S_NUM_0;
+    renderer_config->sample_rate = 44100;
+    renderer_config->sample_rate_modifier = 1.0;
+    renderer_config->output_mode = AUDIO_OUTPUT_MODE;
+
+    if (renderer_config->output_mode == DAC_BUILT_IN)
+    {
+        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
+    }
+
+    return renderer_config;
+}
 
 static void init_i2s(renderer_config_t *config)
 {
@@ -40,16 +57,6 @@ static void init_i2s(renderer_config_t *config)
         mode = mode | I2S_MODE_PDM;
     }
 
-    /* don't use audio pll on buggy rev0 chips */
-    int use_apll = 0;
-    esp_chip_info_t out_info;
-    esp_chip_info(&out_info);
-    if (out_info.revision > 0 && (config->output_mode == I2S))
-    {
-        use_apll = 1;
-        ESP_LOGI(TAG, "chip revision %d, enabling APLL for I2S", out_info.revision);
-    }
-
     /*
      * Allocate just enough to decode AAC+, which has huge frame sizes.
      *
@@ -60,34 +67,34 @@ static void init_i2s(renderer_config_t *config)
      * 32 bit: 32 * 256 = 16384 bytes
      */
     i2s_config_t i2s_config = {
-        .mode = mode, // Only TX
+         .mode = mode, // Only TX
         .sample_rate = config->sample_rate,
         .bits_per_sample = config->bit_depth,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // 2-channels
         .communication_format = comm_fmt,
-        .dma_buf_count = 32,                      // number of buffers, 128 max.
-        .dma_buf_len = 64,                        // size of each buffer
-        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL1, // Interrupt level 1
-        .use_apll = use_apll};
+        .dma_buf_count = 3,                      // number of buffers, 128 max.
+        .dma_buf_len = 300,                        // size of each buffer
+        .intr_alloc_flags = ESP_INTR_FLAG_LEVEL2, // Interrupt level 1
+        .use_apll = false};
 
     i2s_pin_config_t pin_config = {
-        .bck_io_num = GPIO_NUM_26,
-        .ws_io_num = GPIO_NUM_25,
-        .data_out_num = GPIO_NUM_22,
+        .bck_io_num = BCK_PIN,
+        .ws_io_num = WS_PIN,
+        .data_out_num = OUT_PIN,
         .data_in_num = I2S_PIN_NO_CHANGE};
 
-    /* If using Generic I2S generate the MCLK signal on GPIO19
+    /* If using Generic I2S generate the MCLK signal on GPIO
      * May need to change the MCLK frequency value for different I2S adapters
      * */
     if (config->output_mode == I2S)
     {
-        mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, GPIO_NUM_19);
+        mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCLK_PIN);
         mcpwm_pin_config_t pwm_pin_config = {
-            .mcpwm0a_out_num = GPIO_NUM_19};
+            .mcpwm0a_out_num = MCLK_PIN};
         mcpwm_set_pin(MCPWM_UNIT_0, &pwm_pin_config);
-        gpio_pulldown_en(GPIO_NUM_19);
+        gpio_pulldown_en(MCLK_PIN);
         mcpwm_config_t pwm_config;
-        pwm_config.frequency = 22499962; //Default MCLK frequency for Boom bonet.
+        pwm_config.frequency = 1000000; //Default MCLK frequency for Boom bonet.
         pwm_config.cmpr_a = 50.0;
         pwm_config.cmpr_b = 50.0;
         pwm_config.counter_mode = MCPWM_UP_COUNTER;
@@ -235,15 +242,6 @@ void render_samples(char *buf, uint32_t buf_len, pcm_format_t *buf_desc)
             ptr_l += stride;
         }
     }
-
-    /* takes too long
-    i2s_event_t evt = {0};
-    if(xQueueReceive(i2s_event_queue, &evt, 0)) {
-        if(evt.type == I2S_EVENT_TX_DONE) {
-            ESP_LOGE(TAG, "DMA Buffer Underflow");
-        }
-    }
-    */
 }
 
 void renderer_zero_dma_buffer()
@@ -257,14 +255,14 @@ renderer_config_t *renderer_get()
 }
 
 /* init renderer sink */
-void renderer_init(renderer_config_t *config)
+void renderer_init()
 {
     // update global
-    renderer_instance = config;
+    renderer_instance = create_renderer_config();
     renderer_status = INITIALIZED;
 
-    ESP_LOGI(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", config->output_mode, config->i2s_num, config->bit_depth, config->sample_rate);
-    init_i2s(config);
+    ESP_LOGI(TAG, "init I2S mode %d, port %d, %d bit, %d Hz", renderer_instance->output_mode, renderer_instance->i2s_num, renderer_instance->bit_depth, renderer_instance->sample_rate);
+    init_i2s(renderer_instance);
 }
 
 void renderer_start()

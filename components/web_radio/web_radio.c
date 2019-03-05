@@ -19,13 +19,11 @@
 #include "vector.h"
 #include "web_radio.h"
 #include "http.h"
-#include "url_parser.h"
 #include "controls.h"
-#include "playlist.h"
 #include "audio_player.h"
-#include <tcpip_adapter.h>
-#include <esp_wifi.h>
-#include <esp_system.h>
+#include "tcpip_adapter.h"
+#include "esp_wifi.h"
+#include "esp_system.h"
 
 #define TAG "web_radio"
 
@@ -131,7 +129,7 @@ static void http_get_task(void *pvParameters)
     callbacks.on_headers_complete = on_headers_complete_cb;
     callbacks.on_message_complete = on_message_complete_cb;
 
-    for (;;)
+    while (1)
     {
         // blocks until end of stream
         curr_track = playlist_curr_track(radio_conf->playlist);
@@ -166,7 +164,7 @@ void web_radio_start(web_radio_t *config)
 {
     // start reader task
     xTaskCreatePinnedToCore(&http_get_task, "http_get_task", 2560, config, 20,
-                            NULL, 1);
+                            NULL, 0);
 }
 
 void web_radio_stop(web_radio_t *config)
@@ -185,14 +183,14 @@ void web_radio_gpio_handler_task(void *pvParams)
     xQueueHandle gpio_evt_queue = params->gpio_evt_queue;
 
     uint32_t io_num;
-    for (;;)
+    while (1)
     {
         if (xQueueReceive(gpio_evt_queue, &io_num, 20 / portTICK_PERIOD_MS))
         {
             ESP_LOGI(TAG, "GPIO[%d] intr, val: %d", io_num, gpio_get_level(io_num));
 
             i = 0;
-            for (;;)
+            while (1)
             {
                 if (gpio_get_level(0))
                 {
@@ -215,6 +213,20 @@ void web_radio_gpio_handler_task(void *pvParams)
     }
 }
 
+void web_radio_init(web_radio_t *config)
+{
+    controls_init(web_radio_gpio_handler_task, 2048, config);
+    // lcd_task_init(web_radio_lcd_handler_task, 2048, config);
+    audio_player_init(config->player_config);
+}
+
+void web_radio_destroy(web_radio_t *config)
+{
+    controls_destroy(config);
+    //  lcd_task_destroy(config);
+    audio_player_destroy(config->player_config);
+}
+
 // void web_radio_lcd_handler_task(void *pvParams)
 // {
 //     char buf[3];
@@ -227,7 +239,7 @@ void web_radio_gpio_handler_task(void *pvParams)
 //     wl_conn = false;
 //     while (esp_wifi_connect() != ESP_OK) ;
 
-//     for(;;)
+//      while(1)
 //     {
 //         vTaskDelay(200 / portTICK_PERIOD_MS);
 
@@ -293,17 +305,3 @@ void web_radio_gpio_handler_task(void *pvParams)
 //         }
 //     }
 // }
-
-void web_radio_init(web_radio_t *config)
-{
-    controls_init(web_radio_gpio_handler_task, 2048, config);
-    // lcd_task_init(web_radio_lcd_handler_task, 2048, config);
-    audio_player_init(config->player_config);
-}
-
-void web_radio_destroy(web_radio_t *config)
-{
-    controls_destroy(config);
-    //  lcd_task_destroy(config);
-    audio_player_destroy(config->player_config);
-}

@@ -15,24 +15,23 @@
 
 #include "controls.h"
 
-
 static xQueueHandle gpio_evt_queue = NULL;
 static TaskHandle_t *gpio_task;
 #define ESP_INTR_FLAG_DEFAULT 0
 
 /* gpio event handler */
-static void IRAM_ATTR gpio_isr_handler(void* arg)
+static void IRAM_ATTR gpio_isr_handler(void *arg)
 {
     BaseType_t xHigherPriorityTaskWoken = pdFALSE;
-    uint32_t gpio_num = (uint32_t) arg;
+    uint32_t gpio_num = (uint32_t)arg;
 
     xQueueSendToBackFromISR(gpio_evt_queue, &gpio_num, &xHigherPriorityTaskWoken);
 
-    if(xHigherPriorityTaskWoken) {
+    if (xHigherPriorityTaskWoken)
+    {
         portYIELD_FROM_ISR();
     }
 }
-
 
 void controls_init(TaskFunction_t gpio_handler_task, const uint16_t usStackDepth, void *user_data)
 {
@@ -40,8 +39,8 @@ void controls_init(TaskFunction_t gpio_handler_task, const uint16_t usStackDepth
 
     //interrupt of rising edge
     io_conf.intr_type = GPIO_PIN_INTR_NEGEDGE;
-    //bit mask of the pins, use GPIO0 here ("Boot" button)
-    io_conf.pin_bit_mask = (1 << GPIO_NUM_0);
+    //bit mask of the pin, use GPIO here
+    io_conf.pin_bit_mask = (1 << CONTROL_PIN);
     //set as input mode
     io_conf.mode = GPIO_MODE_INPUT;
     //disable pull-down mode
@@ -63,15 +62,15 @@ void controls_init(TaskFunction_t gpio_handler_task, const uint16_t usStackDepth
     gpio_install_isr_service(ESP_INTR_FLAG_DEFAULT);
 
     // remove existing handler that may be present
-    gpio_isr_handler_remove(GPIO_NUM_0);
+    gpio_isr_handler_remove(CONTROL_PIN);
 
     //hook isr handler for specific gpio pin
-    gpio_isr_handler_add(GPIO_NUM_0, gpio_isr_handler, (void*) GPIO_NUM_0);
+    gpio_isr_handler_add(CONTROL_PIN, gpio_isr_handler, (void *)CONTROL_PIN);
 }
 
 void controls_destroy()
 {
-    gpio_isr_handler_remove(GPIO_NUM_0);
+    gpio_isr_handler_remove(CONTROL_PIN);
     vTaskDelete(gpio_task);
     vQueueDelete(gpio_evt_queue);
     // TODO: free gpio_handler_param_t params

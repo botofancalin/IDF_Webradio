@@ -1,7 +1,7 @@
-menu "Web Radio / Bluetooth Speaker"
+menu "Web Radio"
 
 menuconfig TITLE_PARSER
-    bool "Title parser !!TEST!!"
+    bool "Title parser"
     
 menu "Wifi Configuration"
 
@@ -44,19 +44,5 @@ config AUDIO_OUTPUT_MODE
     default 2 if AUDIO_OUTPUT_MODE_PDM
 
 endmenu
-
-menuconfig BT_SPEAKER_MODE
-    bool "Bluetooth Speaker Mode"
-    help
-       Select this option to turn on bluetooth speaker mode.
-       Web radio streaming will be unavailable.
-   depends on CLASSIC_BT_ENABLED
-
-config BT_NAME
-    string "Bluetooth Name"
-	default "ESP_SPEAKER"
-	help
-		Bluetooth name exposed by the device.
-   depends on BT_SPEAKER_MODE
 
 endmenu

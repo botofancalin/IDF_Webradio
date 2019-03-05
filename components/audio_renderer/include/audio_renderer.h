@@ -12,6 +12,14 @@
 #include "driver/i2s.h"
 #include "common_component.h"
 
+#define MCLK_PIN    GPIO_NUM_32
+#define BCK_PIN     GPIO_NUM_26
+#define WS_PIN      GPIO_NUM_25
+#define OUT_PIN     GPIO_NUM_33
+
+// defined via 'make menuconfig'
+#define AUDIO_OUTPUT_MODE CONFIG_AUDIO_OUTPUT_MODE
+
 typedef enum {
     I2S, DAC_BUILT_IN, PDM
 } output_mode_t;
@@ -54,7 +62,7 @@ typedef struct
 /* generic renderer interface */
 void render_samples(char *buf, uint32_t len, pcm_format_t *format);
 
-void renderer_init(renderer_config_t *config);
+void renderer_init();
 void renderer_start();
 void renderer_stop();
 void renderer_destroy();

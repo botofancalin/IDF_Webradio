@@ -12,7 +12,6 @@
 #include "esp_event_loop.h"
 #include "esp_log.h"
 
-#include "playerconfig.h"
 #include "wifi.h"
 
 #define TAG "wifi"
@@ -88,8 +87,8 @@ void initialise_wifi(EventGroupHandle_t wifi_event_group)
 
     wifi_config_t wifi_config = {
         .sta = {
-            .ssid = WIFI_AP_NAME,
-            .password = WIFI_AP_PASS,
+            .ssid = CONFIG_WIFI_SSID,
+            .password = CONFIG_WIFI_PASSWORD,
             .bssid_set = 0
         },
     };

@@ -15,16 +15,10 @@
 #include "driver/i2s.h"
 
 #include "vector.h"
-#include "spiram_fifo.h"
+#include "esp32_fifo.h"
 #include "audio_renderer.h"
 #include "web_radio.h"
-#include "playerconfig.h"
 #include "wifi.h"
-#include "app_main.h"
-#ifdef CONFIG_BT_SPEAKER_MODE
-#include "bt_speaker.h"
-#endif
-#include "playlist.h"
 #include "driver/gpio.h"
 
 #define WIFI_LIST_NUM 10
@@ -38,15 +32,19 @@
 
 static void init_hardware()
 {
-    nvs_flash_init();
+    esp_err_t ret = nvs_flash_init();
+    if (ret == ESP_ERR_NVS_NO_FREE_PAGES || ret == ESP_ERR_NVS_NEW_VERSION_FOUND)
+    {
+        ESP_ERROR_CHECK(nvs_flash_erase());
+        ret = nvs_flash_init();
+    }
+    ESP_ERROR_CHECK(ret);
 
     //Initialize the SPI RAM chip communications and see if it actually retains some bytes. If it
     //doesn't, warn user.
-    if (!spiRamFifoInit())
+    if (!FifoInit())
     {
         printf("\n\nSPI RAM chip fail!\n");
-        while (1)
-            ;
     }
 
     ESP_LOGI(TAG, "hardware initialized");
@@ -67,24 +65,6 @@ static void start_wifi()
                         false, true, portMAX_DELAY);
 }
 
-static renderer_config_t *create_renderer_config()
-{
-    renderer_config_t *renderer_config = calloc(1, sizeof(renderer_config_t));
-
-    renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_32BIT;
-    renderer_config->i2s_num = I2S_NUM_0;
-    renderer_config->sample_rate = 44100;
-    renderer_config->sample_rate_modifier = 1.0;
-    renderer_config->output_mode = AUDIO_OUTPUT_MODE;
-
-    if (renderer_config->output_mode == DAC_BUILT_IN)
-    {
-        renderer_config->bit_depth = I2S_BITS_PER_SAMPLE_16BIT;
-    }
-
-    return renderer_config;
-}
-
 static void start_web_radio()
 {
     // init web radio
@@ -97,11 +77,11 @@ static void start_web_radio()
     radio_config->player_config->command = CMD_NONE;
     radio_config->player_config->decoder_status = UNINITIALIZED;
     radio_config->player_config->decoder_command = CMD_NONE;
-    radio_config->player_config->buffer_pref = BUF_PREF_SAFE;
+    radio_config->player_config->buffer_pref = BUF_PREF_FAST;
     radio_config->player_config->media_stream = calloc(1, sizeof(media_stream_t));
 
     // init renderer
-    renderer_init(create_renderer_config());
+    renderer_init();
 
     // start radio
     web_radio_init(radio_config);
@@ -117,6 +97,9 @@ void app_main()
     ESP_LOGI(TAG, "RAM left: %u", esp_get_free_heap_size());
 
     init_hardware();
+    gpio_pad_select_gpio(GPIO_NUM_27);
+    gpio_set_direction(GPIO_NUM_27, GPIO_MODE_OUTPUT);
+    gpio_set_level(GPIO_NUM_27, 0);
 
 #ifdef CONFIG_BT_SPEAKER_MODE
     bt_speaker_start(create_renderer_config());
