@@ -89,8 +89,9 @@ int ini_parse_string(const char* string, ini_handler handler, void* user);
 #endif
 
 /* Nonzero to use stack, zero to use heap (malloc/free). */
+#define INI_USE_STACK (0)
 #ifndef INI_USE_STACK
-#define INI_USE_STACK 1
+#define INI_USE_STACK (1)
 #endif
 
 /* Stop parsing on first error (default is to keep parsing). */
