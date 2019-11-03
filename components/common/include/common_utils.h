@@ -1,10 +1,3 @@
-/*
- * common_utils.h
- *
- *  Created on: 13.06.2017
- *      Author: michaelboeckling
- */
-
 #ifndef _INCLUDE_COMMON_UTILS_H_
 #define _INCLUDE_COMMON_UTILS_H_
 

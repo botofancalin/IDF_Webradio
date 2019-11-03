@@ -1,31 +1,26 @@
-/*
- * vector.c
- *
- *  Created on: 10.06.2017
- *      Author: michaelboeckling
- */
-
 #include <stdlib.h>
 #include <stddef.h>
 #include <stdint.h>
 #include <string.h>
 #include "vector.h"
 
-struct vec_struct_t {
+struct vec_struct_t
+{
     void *data;
     size_t capacity;
     size_t elems;
     size_t elem_size;
 };
 
-
 vec_t *vec_init(size_t elem_size, size_t init_capacity)
 {
     vec_t *v = calloc(1, sizeof(vec_t));
-    if(!v) return NULL;
+    if (!v)
+        return NULL;
 
     v->data = malloc(init_capacity * elem_size);
-    if (!v->data) {
+    if (!v->data)
+    {
         free(v);
         return NULL;
     }
@@ -37,9 +32,10 @@ vec_t *vec_init(size_t elem_size, size_t init_capacity)
     return v;
 }
 
-void vec_add(vec_t *v, void* elem)
+void vec_add(vec_t *v, void *elem)
 {
-    if(v->elems == v->capacity) {
+    if (v->elems == v->capacity)
+    {
         // add 50% capacity
         v->capacity = v->capacity + (v->capacity / 2);
         v->data = realloc(v->data, v->capacity * v->elem_size);
@@ -50,7 +46,8 @@ void vec_add(vec_t *v, void* elem)
 
 void *vec_get(vec_t *v, size_t idx)
 {
-    if(idx >= v->elems) {
+    if (idx >= v->elems)
+    {
         return NULL;
     }
 

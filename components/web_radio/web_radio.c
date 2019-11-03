@@ -1,10 +1,3 @@
-/*
- * web_radio.c
- *
- *  Created on: 13.03.2017
- *      Author: michaelboeckling
- */
-
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
@@ -41,7 +34,9 @@ static int on_header_field_cb(http_parser *parser, const char *at, size_t length
     // convert to lower case
     unsigned char *c = (unsigned char *)at;
     for (; *c; ++c)
+    {
         *c = tolower(*c);
+    }
 
     curr_header_field = 0;
     if (strstr(at, "content-type"))

@@ -1,10 +1,3 @@
-/*
- * vector.h
- *
- *  Created on: 10.06.2017
- *      Author: michaelboeckling
- */
-
 #ifndef _INCLUDE_VECTOR_H_
 #define _INCLUDE_VECTOR_H_
 

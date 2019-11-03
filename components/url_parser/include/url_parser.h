@@ -1,13 +1,5 @@
-/*
- * url_parser.h
- *
- *  Created on: 29.03.2017
- *      Author: michaelboeckling
- */
-
 #ifndef _URL_PARSER_H_
 #define _URL_PARSER_H_
-
 
 typedef struct
 {
@@ -28,10 +20,8 @@ typedef struct
 
 } url_t;
 
-
 url_t *url_parse(char *uri);
 
 void url_free(url_t *url);
-
 
 #endif /* _URL_PARSER_H_ */

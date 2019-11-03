@@ -36,7 +36,7 @@ static xSemaphoreHandle semCanWrite;
 static xSemaphoreHandle mux;
 static long fifoOvfCnt, fifoUdrCnt;
 static char *fifoBuffer = NULL;
-static size_t buffSize = 128*1024;
+static size_t buffSize = 128 * 1024;
 
 #define RamWrite(pos, buf, n) memcpy(&fifoBuffer[pos], buf, n)
 #define RamRead(pos, buf, n) memcpy(buf, &fifoBuffer[pos], n)

@@ -1,10 +1,3 @@
-/*
- * audio_renderer.h
- *
- *  Created on: 12.03.2017
- *      Author: michaelboeckling
- */
-
 #ifndef INCLUDE_AUDIO_RENDERER_H_
 #define INCLUDE_AUDIO_RENDERER_H_
 
@@ -12,18 +5,20 @@
 #include "driver/i2s.h"
 #include "common_component.h"
 
-#define MCLK_PIN    GPIO_NUM_32
-#define BCK_PIN     GPIO_NUM_26
-#define WS_PIN      GPIO_NUM_25
-#define OUT_PIN     GPIO_NUM_33
+#define MCLK_PIN GPIO_NUM_32
+#define BCK_PIN GPIO_NUM_26
+#define WS_PIN GPIO_NUM_25
+#define OUT_PIN GPIO_NUM_33
 
 // defined via 'make menuconfig'
 #define AUDIO_OUTPUT_MODE CONFIG_AUDIO_OUTPUT_MODE
 
-typedef enum {
-    I2S, DAC_BUILT_IN, PDM
+typedef enum
+{
+    I2S,
+    DAC_BUILT_IN,
+    PDM
 } output_mode_t;
-
 
 typedef struct
 {
@@ -41,12 +36,14 @@ typedef struct
  */
 typedef enum
 {
-    PCM_INTERLEAVED, PCM_LEFT_RIGHT
+    PCM_INTERLEAVED,
+    PCM_LEFT_RIGHT
 } pcm_buffer_layout_t;
 
 typedef enum
 {
-    PCM_BIG_ENDIAN, PCM_LITTLE_ENDIAN
+    PCM_BIG_ENDIAN,
+    PCM_LITTLE_ENDIAN
 } pcm_endianness_t;
 
 typedef struct
@@ -58,7 +55,6 @@ typedef struct
     pcm_endianness_t endianness; // currently unused
 } pcm_format_t;
 
-
 /* generic renderer interface */
 void render_samples(char *buf, uint32_t len, pcm_format_t *format);
 
@@ -69,6 +65,5 @@ void renderer_destroy();
 
 void renderer_zero_dma_buffer();
 renderer_config_t *renderer_get();
-
 
 #endif /* INCLUDE_AUDIO_RENDERER_H_ */

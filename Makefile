@@ -3,8 +3,6 @@
 # project subdirectory.
 #
 
-PROJECT_NAME := idf_webradio
-
-COMPONENT_ADD_INCLUDEDIRS := components/include
+PROJECT_NAME := $(notdir $(CURDIR))
 
 include $(IDF_PATH)/make/project.mk

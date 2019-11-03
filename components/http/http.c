@@ -6,7 +6,6 @@
 #include "esp_wifi.h"
 #include "esp_event_loop.h"
 #include "esp_log.h"
-#include "nvs_flash.h"
 #include "errno.h"
 
 #include "lwip/err.h"
@@ -19,7 +18,6 @@
 #include "http.h"
 #include "audio_player.h"
 
-
 #define TAG "http_client"
 
 #ifdef CONFIG_TITLE_PARSER
@@ -31,34 +29,45 @@ void title_icy_parser(char recv_buf, char *head_buf, int *pos, int *s)
     if (*s == len && recv_buf == '\'')
     {
         (*s)++;
-    } else if (*s == len) {
+    }
+    else if (*s == len)
+    {
         head_buf[(*pos)++] = recv_buf;
     }
 
-    if (*s >= len) {
+    if (*s >= len)
+    {
         return;
     }
 
-    if (recv_buf == str[*s]) {
+    if (recv_buf == str[*s])
+    {
         (*s)++;
-    } else {
+    }
+    else
+    {
         *s = 0;
     }
 }
 
 void str_parser(const char *str, char recv_buf, int *s)
 {
-    if (*s == strlen(str)) {
+    if (*s == strlen(str))
+    {
         (*s)++;
     }
 
-    if (*s > strlen(str)) {
+    if (*s > strlen(str))
+    {
         return;
     }
 
-    if (recv_buf == str[*s]) {
+    if (recv_buf == str[*s])
+    {
         (*s)++;
-    } else {
+    }
+    else
+    {
         *s = 0;
     }
 }
@@ -70,7 +79,7 @@ void str_parser(const char *str, char recv_buf, int *s)
 int http_client_get(const char *uri, http_parser_settings *callbacks, void *user_data)
 {
     player_t *player = user_data;
-    url_t *url = url_parse((char*)uri);
+    url_t *url = url_parse((char *)uri);
 
     const struct addrinfo hints = {
         .ai_family = AF_INET,
@@ -82,7 +91,8 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
     snprintf(port_str, 6, "%d", url->port);
 
     int err = getaddrinfo(url->host, port_str, &hints, &res);
-    if(err != ESP_OK || res == NULL) {
+    if (err != ESP_OK || res == NULL)
+    {
         ESP_LOGE(TAG, "DNS lookup failed err=%d res=%p", err, res);
         return err;
     }
@@ -93,18 +103,20 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
 
     // allocate socket
     int sock = socket(res->ai_family, res->ai_socktype, 0);
-    if(sock < 0) {
+    if (sock < 0)
+    {
         ESP_LOGE(TAG, "... Failed to allocate socket.");
         freeaddrinfo(res);
     }
     ESP_LOGI(TAG, "... allocated socket");
-    
+
     // receiving timeout
     struct timeval receiving_timeout;
     receiving_timeout.tv_sec = 3;
     receiving_timeout.tv_usec = 500;
     if (setsockopt(sock, SOL_SOCKET, SO_RCVTIMEO, &receiving_timeout,
-            sizeof(receiving_timeout)) < 0) {
+                   sizeof(receiving_timeout)) < 0)
+    {
         ESP_LOGE(TAG, "... failed to set socket receiving timeout");
         close(sock);
         vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -113,11 +125,13 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
 
     // connect, retrying a few times
     char retries = 0;
-    while(connect(sock, res->ai_addr, res->ai_addrlen) != 0) {
+    while (connect(sock, res->ai_addr, res->ai_addrlen) != 0)
+    {
         retries++;
         ESP_LOGE(TAG, "... socket connect attempt %d failed, errno=%d", retries, errno);
 
-        if(retries > 5) {
+        if (retries > 5)
+        {
             ESP_LOGE(TAG, "giving up");
             close(sock);
             freeaddrinfo(res);
@@ -131,9 +145,9 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
     // write http request
     char *request;
 #ifdef CONFIG_TITLE_PARSER
-    if(asprintf(&request, "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: ESP32\r\nAccept: */*\r\nIcy-MetaData: 1\r\n\r\n", url->path, url->host, url->port) < 0)
+    if (asprintf(&request, "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: ESP32\r\nAccept: */*\r\nIcy-MetaData: 1\r\n\r\n", url->path, url->host, url->port) < 0)
 #else
-    if(asprintf(&request, "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: ESP32\r\nAccept: */*\r\n\r\n", url->path, url->host, url->port) < 0)
+    if (asprintf(&request, "GET %s HTTP/1.0\r\nHost: %s:%d\r\nUser-Agent: ESP32\r\nAccept: */*\r\n\r\n", url->path, url->host, url->port) < 0)
 #endif
 
     {
@@ -142,7 +156,8 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
 
     ESP_LOGI(TAG, "requesting %s", request);
 
-    if (write(sock, request, strlen(request)) < 0) {
+    if (write(sock, request, strlen(request)) < 0)
+    {
         ESP_LOGE(TAG, "... socket send failed");
         close(sock);
     }
@@ -150,14 +165,13 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
     free(request);
     ESP_LOGI(TAG, "... socket send success");
 
-
     /* Read HTTP response */
     char recv_buf[256];
     bzero(recv_buf, sizeof(recv_buf));
     ssize_t recved;
 
 #ifdef CONFIG_TITLE_PARSER
-    int metaint = 0, recv_len = 0, body = 0, skip = 0, i, m = 0, n=0, pos, s, t = 0, u = 0;
+    int metaint = 0, recv_len = 0, body = 0, skip = 0, i, m = 0, n = 0, pos, s, t = 0, u = 0;
 #endif
 
     /* intercept on_headers_complete() */
@@ -170,17 +184,23 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
     parser.data = user_data;
 
     esp_err_t nparsed = 0;
-    do {
-        recved = read(sock, recv_buf, sizeof(recv_buf)-1);
+    do
+    {
+        recved = read(sock, recv_buf, sizeof(recv_buf) - 1);
 
 #ifdef CONFIG_TITLE_PARSER
-        if (body) {
+        if (body)
+        {
             recv_len += recved;
-        } else {
-            for (i = 0; i < recved ; i++) {
+        }
+        else
+        {
+            for (i = 0; i < recved; i++)
+            {
 
                 str_parser("\r\n\r\n", recv_buf[i], &u);
-                if (u == 5) {
+                if (u == 5)
+                {
                     recv_len = recved - i;
                     body = 1;
 
@@ -190,11 +210,15 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
                 }
 
                 str_parser("icy-metaint:", recv_buf[i], &t);
-                if (t == 13 && recv_buf[i] == '\r') {
+                if (t == 13 && recv_buf[i] == '\r')
+                {
                     t++;
-                    ESP_LOGI(TAG,"icy-metaint: %d", metaint);
-                } else if (t == 13) {
-                    if (recv_buf[i] >= '0' && recv_buf[i] <= '9') {
+                    ESP_LOGI(TAG, "icy-metaint: %d", metaint);
+                }
+                else if (t == 13)
+                {
+                    if (recv_buf[i] >= '0' && recv_buf[i] <= '9')
+                    {
                         metaint *= 10;
                         metaint += recv_buf[i] - 0x30;
                     }
@@ -203,7 +227,8 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
             continue;
         }
 
-        if (recv_len > metaint) {
+        if (recv_len > metaint)
+        {
             m = (recv_len - metaint);
             skip = recv_buf[recved - m];
             skip *= 16;
@@ -212,7 +237,7 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
             n = (recved - m) + skip;
 
             if (skip != 1)
-                ESP_LOGI(TAG,"header skip: %d bytes", skip);
+                ESP_LOGI(TAG, "header skip: %d bytes", skip);
 
             nparsed = callbacks->on_body(&parser, recv_buf, recved - m);
 
@@ -220,19 +245,22 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
 
             s = 0;
             pos = 0;
-            for (i = recved - m; i < n ; i++) {
+            for (i = recved - m; i < n; i++)
+            {
                 if (i >= recved || pos >= TITLE_BUF)
                     break;
                 title_icy_parser(recv_buf[i], player->title, &pos, &s);
             }
 
-            while (n >= recved) {
-                recved = read(sock, recv_buf, sizeof(recv_buf)-1);
+            while (n >= recved)
+            {
+                recved = read(sock, recv_buf, sizeof(recv_buf) - 1);
                 recv_len += recved;
                 n = skip - m;
                 m += recved;
 
-                for (i = 0; i < n ; i++) {
+                for (i = 0; i < n; i++)
+                {
                     if (i >= recved || pos >= TITLE_BUF)
                         break;
                     title_icy_parser(recv_buf[i], player->title, &pos, &s);
@@ -241,19 +269,20 @@ int http_client_get(const char *uri, http_parser_settings *callbacks, void *user
 
             //
 
-            if (pos) {
+            if (pos)
+            {
                 player->title[pos] = '\0';
                 player->update = true;
-                ESP_LOGI(TAG,"title: %s", player->title);
+                ESP_LOGI(TAG, "title: %s", player->title);
             }
 
-            nparsed = callbacks->on_body(&parser, recv_buf + n , recved - n);
+            nparsed = callbacks->on_body(&parser, recv_buf + n, recved - n);
             continue;
         }
 
         // invoke on_body cb directly
         nparsed = callbacks->on_body(&parser, recv_buf, recved);
-    } while(recved > 0 && nparsed >= 0);
+    } while (recved > 0 && nparsed >= 0);
 #else
         // using http parser causes stack overflow somtimes - disable for now
         nparsed = http_parser_execute(&parser, callbacks, recv_buf, recved);

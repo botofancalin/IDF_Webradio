@@ -1,10 +1,3 @@
-/*
- * common_buffer.c
- *
- *  Created on: 28.04.2017
- *      Author: michaelboeckling
- */
-
 #include "common_buffer.h"
 
 #include <stdlib.h>
@@ -18,15 +11,13 @@
 #include "esp32_fifo.h"
 
 /* Swap bytes in 16 bit value.  */
-# define BYTESWAP_16(x) \
-    (__extension__							      \
-     ({ unsigned short int __bsx = (x);					      \
+#define BYTESWAP_16(x) \
+    (__extension__({ unsigned short int __bsx = (x);					      \
         ((((__bsx) >> 8) & 0xff) | (((__bsx) & 0xff) << 8)); }))
 
 /* Swap bytes in 32 bit value.  */
-# define BYTESWAP_32(x) \
-    (__extension__							      \
-     ({ unsigned int __bsx = (x);					      \
+#define BYTESWAP_32(x) \
+    (__extension__({ unsigned int __bsx = (x);					      \
         ((((__bsx) & 0xff000000) >> 24) | (((__bsx) & 0x00ff0000) >>  8) |    \
 	 (((__bsx) & 0x0000ff00) <<  8) | (((__bsx) & 0x000000ff) << 24)); }))
 

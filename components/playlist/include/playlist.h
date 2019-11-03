@@ -8,16 +8,17 @@
 #ifndef _INCLUDE_PLAYLIST_H_
 #define _INCLUDE_PLAYLIST_H_
 
-typedef struct {
+typedef struct
+{
     int16_t curr_pos;
     vec_t *entries_vec;
 } playlist_t;
 
-typedef struct {
+typedef struct
+{
     const char *name;
     const char *url;
 } playlist_entry_t;
-
 
 playlist_t *playlist_create(void);
 

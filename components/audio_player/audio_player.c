@@ -1,10 +1,3 @@
-/*
- * audio_player.c
- *
- *  Created on: 12.03.2017
- *      Author: michaelboeckling
- */
-
 #include <stdlib.h>
 #include "freertos/FreeRTOS.h"
 

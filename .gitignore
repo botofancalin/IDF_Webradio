@@ -1,13 +1,8 @@
-/.vs
 /build
-/CodeDB
-/VisualGDB*
+
 /.settings/
 /.cproject
 /.project
+/sdkconfig
 /sdkconfig.old
 *.DB*
-*.sln
-*.vgdbproj*
-*.cmake
-*.old

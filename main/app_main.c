@@ -101,12 +101,8 @@ void app_main()
     gpio_set_direction(GPIO_NUM_27, GPIO_MODE_OUTPUT);
     gpio_set_level(GPIO_NUM_27, 0);
 
-#ifdef CONFIG_BT_SPEAKER_MODE
-    bt_speaker_start(create_renderer_config());
-#else
     start_wifi();
     start_web_radio();
-#endif
 
     ESP_LOGI(TAG, "RAM left %d", esp_get_free_heap_size());
     //ESP_LOGI(TAG, "app_main stack: %d\n", uxTaskGetStackHighWaterMark(NULL));

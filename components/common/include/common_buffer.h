@@ -1,10 +1,3 @@
-/*
- * common.h
- *
- *  Created on: 27.04.2017
- *      Author: michaelboeckling
- */
-
 #ifndef _INCLUDE_COMMON_BUFFER_H_
 #define _INCLUDE_COMMON_BUFFER_H_
 
@@ -70,16 +63,16 @@ size_t buf_data_stale(buffer_t *buf);
  * @param size Size, in bytes, of each element to be read.
  * @param count Number of elements, each one with a size of size bytes.
  */
-size_t buf_read( void * ptr, size_t size, size_t count, buffer_t *buf);
+size_t buf_read(void *ptr, size_t size, size_t count, buffer_t *buf);
 
 uint16_t fread16(buffer_t *buf, size_t position);
 uint32_t fread32(buffer_t *buf, size_t position);
 
-unsigned int REV16( unsigned int value);
-unsigned int REV32( unsigned int value);
+unsigned int REV16(unsigned int value);
+unsigned int REV32(unsigned int value);
 
 /* write bytes into the buffer */
-size_t buf_write(buffer_t *buf, const void* from, size_t len);
+size_t buf_write(buffer_t *buf, const void *from, size_t len);
 
 /* todo: move elsewhere */
 size_t fill_read_buffer(buffer_t *buf);

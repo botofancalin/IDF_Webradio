@@ -1,11 +1,3 @@
-/*
- * audio_renderer.c
- *
- *  Created on: 12.03.2017
- *      Author: michaelboeckling
- *
- */
-
 #include <stdbool.h>
 
 #include "freertos/FreeRTOS.h"
@@ -15,7 +7,8 @@
 
 #include "audio_player.h"
 #include "audio_renderer.h"
-#include "driver/mcpwm.h"
+#include "driver/ledc.h"
+#include "math.h"
 
 #define TAG "renderer"
 
@@ -67,7 +60,7 @@ static void init_i2s(renderer_config_t *config)
      * 32 bit: 32 * 256 = 16384 bytes
      */
     i2s_config_t i2s_config = {
-         .mode = mode, // Only TX
+        .mode = mode, // Only TX
         .sample_rate = config->sample_rate,
         .bits_per_sample = config->bit_depth,
         .channel_format = I2S_CHANNEL_FMT_RIGHT_LEFT, // 2-channels
@@ -88,18 +81,9 @@ static void init_i2s(renderer_config_t *config)
      * */
     if (config->output_mode == I2S)
     {
-        mcpwm_gpio_init(MCPWM_UNIT_0, MCPWM0A, MCLK_PIN);
-        mcpwm_pin_config_t pwm_pin_config = {
-            .mcpwm0a_out_num = MCLK_PIN};
-        mcpwm_set_pin(MCPWM_UNIT_0, &pwm_pin_config);
-        gpio_pulldown_en(MCLK_PIN);
-        mcpwm_config_t pwm_config;
-        pwm_config.frequency = 1000000; //Default MCLK frequency for Boom bonet.
-        pwm_config.cmpr_a = 50.0;
-        pwm_config.cmpr_b = 50.0;
-        pwm_config.counter_mode = MCPWM_UP_COUNTER;
-        pwm_config.duty_mode = MCPWM_DUTY_MODE_0;
-        mcpwm_init(MCPWM_UNIT_0, MCPWM_TIMER_0, &pwm_config);
+        gpio_pad_select_gpio(MCLK_PIN);
+        gpio_set_direction(MCLK_PIN, GPIO_MODE_OUTPUT);
+        gpio_set_level(MCLK_PIN, 0);
     }
 
     i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue);

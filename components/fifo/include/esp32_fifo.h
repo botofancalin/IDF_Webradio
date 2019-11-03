@@ -4,13 +4,13 @@
 #include <inttypes.h>
 #include <stddef.h>
 
-bool  FifoInit();
-void  FifoRead(char *buff, int len);
-void  FifoWrite(const char *buff, int len);
-int  FifoFill();
-int  FifoFree();
-long  GetOverrunCt();
-long  GetUnderrunCt();
+bool FifoInit();
+void FifoRead(char *buff, int len);
+void FifoWrite(const char *buff, int len);
+int FifoFill();
+int FifoFree();
+long GetOverrunCt();
+long GetUnderrunCt();
 
 void FifoReset();
 int FifoLen();

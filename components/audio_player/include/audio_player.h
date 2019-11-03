@@ -1,10 +1,3 @@
-/*
- * audio_player.h
- *
- *  Created on: 12.03.2017
- *      Author: michaelboeckling
- */
-
 #ifndef INCLUDE_AUDIO_PLAYER_H_
 #define INCLUDE_AUDIO_PLAYER_H_
 
@@ -12,31 +5,41 @@
 #include "common_component.h"
 #include "audio_renderer.h"
 
-#define TITLE_BUF   80
+#define TITLE_BUF 80
 #define STATION_BUF 20
 
 int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_data);
 
-
-typedef enum {
-    CMD_NONE, CMD_START, CMD_STOP
+typedef enum
+{
+    CMD_NONE,
+    CMD_START,
+    CMD_STOP
 } player_command_t;
 
-typedef enum {
-    BUF_PREF_FAST, BUF_PREF_SAFE
+typedef enum
+{
+    BUF_PREF_FAST,
+    BUF_PREF_SAFE
 } buffer_pref_t;
 
 typedef enum
 {
-    MIME_UNKNOWN = 1, OCTET_STREAM, AUDIO_AAC, AUDIO_MP4, AUDIO_MPEG
+    MIME_UNKNOWN = 1,
+    OCTET_STREAM,
+    AUDIO_AAC,
+    AUDIO_MP4,
+    AUDIO_MPEG
 } content_type_t;
 
-typedef struct {
+typedef struct
+{
     content_type_t content_type;
     bool eof;
 } media_stream_t;
 
-typedef struct {
+typedef struct
+{
     player_command_t command;
 
     player_command_t decoder_command;
@@ -55,6 +58,5 @@ void audio_player_init(player_t *player_config);
 void audio_player_start();
 void audio_player_stop();
 void audio_player_destroy();
-
 
 #endif /* INCLUDE_AUDIO_PLAYER_H_ */

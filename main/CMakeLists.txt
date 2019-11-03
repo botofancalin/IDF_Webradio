@@ -1,10 +1,6 @@
-set(COMPONENT_ADD_INCLUDEDIRS include)
-
-# Edit following two lines to set component requirements (see docs)
-set(COMPONENT_REQUIRES )
-set(COMPONENT_PRIV_REQUIRES freertos nvs_flash driver vector fifo audio_renderer web_radio)
-
-set(COMPONENT_SRCS ./app_main.c ./wifi.c)
+file(GLOB template_sources ./*.cpp ./*.c)
+set(COMPONENT_SRCS ${template_sources})
+set(COMPONENT_ADD_INCLUDEDIRS ".")
 
 set(COMPONENT_EMBED_FILES playlist.pls)
 
