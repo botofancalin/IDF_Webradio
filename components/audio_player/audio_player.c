@@ -66,7 +66,7 @@ int audio_stream_consumer(const char *recv_buf, ssize_t bytes_read, void *user_d
     uint8_t fill_level = (bytes_in_buf * 100) / FifoLen();
 
     // seems 4k is enough to prevent initial buffer underflow
-    uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 90;
+    uint8_t min_fill_lvl = player->buffer_pref == BUF_PREF_FAST ? 20 : 70;
     bool enough_buffer = fill_level > min_fill_lvl;
 
     if (player->decoder_command != CMD_START && enough_buffer)

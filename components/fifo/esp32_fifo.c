@@ -25,7 +25,7 @@
 #define TAG "FIFO"
 
 //Low watermark where we restart the reader thread.
-#define FIFO_LOWMARK (112 * 1024)
+#define FIFO_LOWMARK (64 * 1024)
 #define SPIREADSIZE 64
 
 static int fifoRpos;
@@ -36,7 +36,7 @@ static xSemaphoreHandle semCanWrite;
 static xSemaphoreHandle mux;
 static long fifoOvfCnt, fifoUdrCnt;
 static char *fifoBuffer = NULL;
-static size_t buffSize = 128 * 1024;
+static size_t buffSize = (128 * 1024);
 
 #define RamWrite(pos, buf, n) memcpy(&fifoBuffer[pos], buf, n)
 #define RamRead(pos, buf, n) memcpy(buf, &fifoBuffer[pos], n)

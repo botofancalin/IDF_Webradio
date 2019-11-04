@@ -79,8 +79,7 @@ static char *strncpy0(char *dest, const char *src, size_t size)
 }
 
 /* See documentation in header file. */
-int ini_parse_stream(ini_reader reader, void *stream, ini_handler handler,
-                     void *user)
+int ini_parse_stream(ini_reader reader, void *stream, ini_handler handler, void *user)
 {
     /* Uses a fair bit of stack (use heap instead if you need to) */
 #if INI_USE_STACK

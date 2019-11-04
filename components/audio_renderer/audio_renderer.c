@@ -76,16 +76,6 @@ static void init_i2s(renderer_config_t *config)
         .data_out_num = OUT_PIN,
         .data_in_num = I2S_PIN_NO_CHANGE};
 
-    /* If using Generic I2S generate the MCLK signal on GPIO
-     * May need to change the MCLK frequency value for different I2S adapters
-     * */
-    if (config->output_mode == I2S)
-    {
-        gpio_pad_select_gpio(MCLK_PIN);
-        gpio_set_direction(MCLK_PIN, GPIO_MODE_OUTPUT);
-        gpio_set_level(MCLK_PIN, 0);
-    }
-
     i2s_driver_install(config->i2s_num, &i2s_config, 1, &i2s_event_queue);
 
     if ((mode & I2S_MODE_DAC_BUILT_IN) || (mode & I2S_MODE_PDM))
@@ -96,6 +86,9 @@ static void init_i2s(renderer_config_t *config)
     else
     {
         i2s_set_pin(config->i2s_num, &pin_config);
+        /* If using Generic I2S generate the MCLK signal on GPIO_0 */
+        PIN_FUNC_SELECT(PERIPHS_IO_MUX_GPIO0_U, FUNC_GPIO0_CLK_OUT1);
+        WRITE_PERI_REG(PIN_CTRL, 0xFFF0);
     }
 
     i2s_stop(config->i2s_num);

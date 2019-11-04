@@ -5,7 +5,7 @@
 #include "driver/i2s.h"
 #include "common_component.h"
 
-#define MCLK_PIN GPIO_NUM_32
+#define MCLK_PIN GPIO_NUM_0
 #define BCK_PIN GPIO_NUM_26
 #define WS_PIN GPIO_NUM_25
 #define OUT_PIN GPIO_NUM_33

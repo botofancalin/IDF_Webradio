@@ -5,7 +5,7 @@
       "label": "OpenOCD",
       "type": "shell",
       "isBackground": true,
-      "command": "openocd -f interface/ftdi/esp32_devkitj_v1.cfg -f board/esp-wroom-32.cfg",
+      "command": "openocd -f interface/ftdi/um232h.cfg -f board/esp-wroom-32.cfg",
       "problemMatcher": [
         {
           "pattern": [
